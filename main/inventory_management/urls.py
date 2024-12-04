@@ -13,7 +13,11 @@ urlpatterns = [
     path("create_product/", views.ProductCreateView.as_view(), name="create_product"),
     path("warehouses/", views.WarehouseListView.as_view(), name="warehouses"),
     path("warehouses/<int:pk>", views.WarehouseView.as_view(), name="warehouse"),
-    path("create_warehouse/", views.WarehouseCreateView.as_view(), name="create_warehouse"),
+    path(
+        "create_warehouse/",
+        views.WarehouseCreateView.as_view(),
+        name="create_warehouse",
+    ),
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
 ]

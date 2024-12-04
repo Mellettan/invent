@@ -33,18 +33,16 @@ class MainView(LoginRequiredMixin, View):
         start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
         # Создаем префетч-запрос для OrderItem, чтобы сразу получить все позиции заказа
-        order_items_prefetch = Prefetch('items',
-                                        queryset=OrderItem.objects.select_related(
-                                            'product'))
+        order_items_prefetch = Prefetch(
+            "items", queryset=OrderItem.objects.select_related("product")
+        )
 
         # Получаем заказы с предзагруженными данными о позициях заказов
         orders_this_month = Order.objects.prefetch_related(order_items_prefetch).filter(
             created_at__gte=start_of_month, status="Completed"
         )
 
-        total_month_income = sum(
-            order.total_price() for order in orders_this_month
-        )
+        total_month_income = sum(order.total_price() for order in orders_this_month)
 
         low_stock_products = WarehouseProduct.objects.filter(quantity__lt=10).count()
 
@@ -66,48 +64,54 @@ class MainView(LoginRequiredMixin, View):
 
 class OrderView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        order_items_prefetch = Prefetch('items',
-                                        queryset=OrderItem.objects.select_related(
-                                            'product'))
+        order_items_prefetch = Prefetch(
+            "items", queryset=OrderItem.objects.select_related("product")
+        )
 
         # Получаем заказы с предзагруженными данными о позициях заказов
-        order = Order.objects.prefetch_related(order_items_prefetch).filter(
-            pk=pk).first()
+        order = (
+            Order.objects.prefetch_related(order_items_prefetch).filter(pk=pk).first()
+        )
 
         # Получаем все позиции в заказе
         order_items = OrderItem.objects.filter(order=order)
 
         # Если нужен шаблон для просмотра заказа
-        return render(request, 'inventory_management/order.html', {
-            'order': order,
-            'order_items': order_items,
-            'total_price': order.total_price(),
-        })
+        return render(
+            request,
+            "inventory_management/order.html",
+            {
+                "order": order,
+                "order_items": order_items,
+                "total_price": order.total_price(),
+            },
+        )
 
     def post(self, request, pk):
         # Получаем заказ по ID (pk)
         order = get_object_or_404(Order, pk=pk)
 
         # В зависимости от формы вы можете менять статус или обновлять позиции
-        if 'update_status' in request.POST:
+        if "update_status" in request.POST:
             # Например, обновляем статус заказа
-            new_status = request.POST.get('status')
+            new_status = request.POST.get("status")
             order.status = new_status
             order.save()
 
             # Перенаправляем на страницу с деталями заказа после обновления
-            return redirect('inventory_management:order', pk=order.pk)
+            return redirect("inventory_management:order", pk=order.pk)
 
-        elif 'update_items' in request.POST:
+        elif "update_items" in request.POST:
             # Обновляем позиции заказа (например, изменяем количество товаров)
             for item in order.items.all():
                 new_quantity = int(
-                    request.POST.get(f'quantity_{item.pk}', item.quantity))
+                    request.POST.get(f"quantity_{item.pk}", item.quantity)
+                )
                 item.quantity = new_quantity
                 item.save()
 
             # Перенаправляем на страницу с деталями заказа после обновления
-            return redirect('inventory_management:order', pk=order.pk)
+            return redirect("inventory_management:order", pk=order.pk)
 
         return HttpResponseNotAllowed("Метод не разрешен")
 
@@ -115,9 +119,9 @@ class OrderView(LoginRequiredMixin, View):
 class OrderListView(LoginRequiredMixin, View):
     def get(self, request):
         # Создаем префетч-запрос для OrderItem, чтобы сразу получить все позиции заказа
-        order_items_prefetch = Prefetch('items',
-                                        queryset=OrderItem.objects.select_related(
-                                            'product'))
+        order_items_prefetch = Prefetch(
+            "items", queryset=OrderItem.objects.select_related("product")
+        )
 
         # Получаем заказы с предзагруженными данными о позициях заказов
         orders = Order.objects.prefetch_related(order_items_prefetch).all()
@@ -133,8 +137,9 @@ class OrderListView(LoginRequiredMixin, View):
             orders_data.append(order_info)
 
         # Отправляем данные в шаблон
-        return render(request, 'inventory_management/orders.html',
-                      {'orders_data': orders_data})
+        return render(
+            request, "inventory_management/orders.html", {"orders_data": orders_data}
+        )
 
 
 class ProductView(LoginRequiredMixin, View):
@@ -144,74 +149,83 @@ class ProductView(LoginRequiredMixin, View):
 
         # Предзагружаем связанные объекты WarehouseProduct для этого продукта
         warehouse_products = WarehouseProduct.objects.filter(
-            product=product).select_related('warehouse')
+            product=product
+        ).select_related("warehouse")
 
         # Считаем общее количество продукта на складах
         total_quantity = sum(
-            warehouse_product.quantity for warehouse_product in warehouse_products)
+            warehouse_product.quantity for warehouse_product in warehouse_products
+        )
 
         warehouses = Warehouse.objects.all()
 
         # Отправляем данные в шаблон
-        return render(request, 'inventory_management/product.html', {
-            'product': product,
-            'warehouse_products': warehouse_products,
-            'total_quantity': total_quantity,
-            'warehouses': warehouses
-        })
+        return render(
+            request,
+            "inventory_management/product.html",
+            {
+                "product": product,
+                "warehouse_products": warehouse_products,
+                "total_quantity": total_quantity,
+                "warehouses": warehouses,
+            },
+        )
 
     def post(self, request, pk):
         # Получаем продукт по ID (pk)
         product = get_object_or_404(Product, pk=pk)
 
         # Обрабатываем изменение количества товара на складе
-        if 'update_quantity' in request.POST:
+        if "update_quantity" in request.POST:
             for warehouse_product in product.warehouse_products.all():
                 # Изменяем количество товара на складе
-                new_quantity = int(request.POST.get(f'quantity_{warehouse_product.pk}',
-                                                    warehouse_product.quantity))
+                new_quantity = int(
+                    request.POST.get(
+                        f"quantity_{warehouse_product.pk}", warehouse_product.quantity
+                    )
+                )
                 warehouse_product.quantity = new_quantity
                 warehouse_product.save()
 
             # Перенаправляем на страницу с деталями продукта после обновления
-            return redirect('inventory_management:product', pk=product.pk)
+            return redirect("inventory_management:product", pk=product.pk)
 
         # Обрабатываем изменение цены продукта
-        elif 'update_price' in request.POST:
-            new_price = request.POST.get('price')
+        elif "update_price" in request.POST:
+            new_price = request.POST.get("price")
             if new_price:
                 product.price = new_price
                 product.save()
 
             # Перенаправляем на страницу с деталями продукта после обновления
-            return redirect('inventory_management:product', pk=product.pk)
+            return redirect("inventory_management:product", pk=product.pk)
 
-        elif 'add_warehouse' in request.POST:
+        elif "add_warehouse" in request.POST:
             # Получаем выбранный склад и количество
-            warehouse_id = request.POST.get('warehouse')
-            quantity = int(request.POST.get('new_quantity'))
+            warehouse_id = request.POST.get("warehouse")
+            quantity = int(request.POST.get("new_quantity"))
 
             # Получаем склад по ID
             warehouse = get_object_or_404(Warehouse, pk=warehouse_id)
 
             # Создаем новую запись WarehouseProduct
             WarehouseProduct.objects.create(
-                product=product,
-                warehouse=warehouse,
-                quantity=quantity
+                product=product, warehouse=warehouse, quantity=quantity
             )
 
             # Перенаправляем на страницу с деталями продукта после добавления склада
-            return redirect('inventory_management:product', pk=product.pk)
+            return redirect("inventory_management:product", pk=product.pk)
 
         return HttpResponseNotAllowed("Метод не разрешен")
+
 
 class ProductListView(LoginRequiredMixin, View):
     def get(self, request):
         # Создаем префетч-запрос для WarehouseProduct, чтобы сразу получить все продукты на складах
-        warehouse_products_prefetch = Prefetch('warehouse_products',
-                                               queryset=WarehouseProduct.objects.select_related(
-                                                   'warehouse'))
+        warehouse_products_prefetch = Prefetch(
+            "warehouse_products",
+            queryset=WarehouseProduct.objects.select_related("warehouse"),
+        )
 
         # Получаем все продукты с предзагруженными данными о складах
         products = Product.objects.prefetch_related(warehouse_products_prefetch).all()
@@ -224,15 +238,19 @@ class ProductListView(LoginRequiredMixin, View):
                 "warehouses": product.warehouse_products.all(),
                 # Используем предзагруженные данные
                 "total_quantity": sum(
-                    warehouse_product.quantity for warehouse_product in
-                    product.warehouse_products.all()),
+                    warehouse_product.quantity
+                    for warehouse_product in product.warehouse_products.all()
+                ),
                 # Сумма всех количеств товара на складах
             }
             products_data.append(product_info)
 
         # Отправляем данные в шаблон
-        return render(request, 'inventory_management/products.html',
-                      {'products_data': products_data})
+        return render(
+            request,
+            "inventory_management/products.html",
+            {"products_data": products_data},
+        )
 
 
 class WarehouseView(LoginRequiredMixin, View):
@@ -241,19 +259,19 @@ class WarehouseView(LoginRequiredMixin, View):
         warehouse = get_object_or_404(Warehouse, pk=pk)
 
         # Отправляем данные о складе в шаблон для отображения
-        return render(request, 'inventory_management/warehouse.html', {
-            'warehouse': warehouse
-        })
+        return render(
+            request, "inventory_management/warehouse.html", {"warehouse": warehouse}
+        )
 
     def post(self, request, pk):
         # Получаем склад по ID (pk)
         warehouse = get_object_or_404(Warehouse, pk=pk)
 
         # Если были изменены данные о складе
-        if 'update_warehouse' in request.POST:
+        if "update_warehouse" in request.POST:
             # Извлекаем данные из формы
-            new_name = request.POST.get('name')
-            new_location = request.POST.get('location')
+            new_name = request.POST.get("name")
+            new_location = request.POST.get("location")
 
             # Обновляем данные о складе
             warehouse.name = new_name
@@ -261,7 +279,7 @@ class WarehouseView(LoginRequiredMixin, View):
             warehouse.save()
 
             # Перенаправляем на страницу с деталями склада после обновления
-            return redirect('inventory_management:warehouse', pk=warehouse.pk)
+            return redirect("inventory_management:warehouse", pk=warehouse.pk)
 
         return HttpResponseNotAllowed("Метод не разрешен")
 
@@ -275,48 +293,57 @@ class WarehouseListView(LoginRequiredMixin, View):
         warehouses_data = []
         for warehouse in warehouses:
             warehouse_products = WarehouseProduct.objects.filter(
-                warehouse=warehouse).select_related('product')
-            warehouses_data.append({
-                'warehouse': warehouse,
-                'warehouse_products': warehouse_products,
-                'total_quantity': sum(
-                    warehouse_product.quantity for warehouse_product in
-                    warehouse_products)
-            })
+                warehouse=warehouse
+            ).select_related("product")
+            warehouses_data.append(
+                {
+                    "warehouse": warehouse,
+                    "warehouse_products": warehouse_products,
+                    "total_quantity": sum(
+                        warehouse_product.quantity
+                        for warehouse_product in warehouse_products
+                    ),
+                }
+            )
 
         # Отправляем данные в шаблон
-        return render(request, 'inventory_management/warehouses.html', {
-            'warehouses_data': warehouses_data
-        })
+        return render(
+            request,
+            "inventory_management/warehouses.html",
+            {"warehouses_data": warehouses_data},
+        )
 
 
 class ProductCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'inventory_management/product_create.html')
+        return render(request, "inventory_management/product_create.html")
 
     def post(self, request):
         # Получаем данные из формы
-        product_name = request.POST.get('name')
-        product_price = request.POST.get('price')
-        product_description = request.POST.get('description')
+        product_name = request.POST.get("name")
+        product_price = request.POST.get("price")
+        product_description = request.POST.get("description")
 
         if product_name and product_price:
             # Создаем новый продукт
-            product = Product.objects.create(name=product_name, price=product_price,
-                                             description=product_description)
-            return redirect('inventory_management:product', pk=product.pk)
+            product = Product.objects.create(
+                name=product_name, price=product_price, description=product_description
+            )
+            return redirect("inventory_management:product", pk=product.pk)
         return HttpResponseNotAllowed("Метод не разрешен")
 
 
 class OrderCreateView(LoginRequiredMixin, View):
     def get(self, request):
         products = Product.objects.all()  # Получаем все продукты
-        return render(request, 'inventory_management/order_create.html', {'products': products})
+        return render(
+            request, "inventory_management/order_create.html", {"products": products}
+        )
 
     def post(self, request):
         # Получаем данные из формы
-        product_ids = request.POST.getlist('product_ids')  # Список ID продуктов
-        quantities = request.POST.getlist('quantities')  # Список количеств товаров
+        product_ids = request.POST.getlist("product_ids")  # Список ID продуктов
+        quantities = request.POST.getlist("quantities")  # Список количеств товаров
 
         if product_ids and quantities:
             # Создаем новый заказ
@@ -325,10 +352,11 @@ class OrderCreateView(LoginRequiredMixin, View):
             # Добавляем товары в заказ
             for product_id, quantity in zip(product_ids, quantities):
                 product = Product.objects.get(id=product_id)
-                OrderItem.objects.create(order=order, product=product,
-                                         quantity=quantity)
+                OrderItem.objects.create(
+                    order=order, product=product, quantity=quantity
+                )
 
-            return redirect('inventory_management:order', pk=order.pk)
+            return redirect("inventory_management:order", pk=order.pk)
 
         return HttpResponseNotAllowed("Метод не разрешен")
 
@@ -336,18 +364,20 @@ class OrderCreateView(LoginRequiredMixin, View):
 class WarehouseCreateView(LoginRequiredMixin, View):
     def get(self, request):
         # Отображаем форму для создания нового склада
-        return render(request, 'inventory_management/warehouse_create.html')
+        return render(request, "inventory_management/warehouse_create.html")
 
     def post(self, request):
         # Получаем данные из формы
-        warehouse_name = request.POST.get('name')
-        warehouse_location = request.POST.get('location')
+        warehouse_name = request.POST.get("name")
+        warehouse_location = request.POST.get("location")
 
         if warehouse_name and warehouse_location:
             # Создаем новый склад
-            warehouse = Warehouse.objects.create(name=warehouse_name, location=warehouse_location)
+            warehouse = Warehouse.objects.create(
+                name=warehouse_name, location=warehouse_location
+            )
 
-            return redirect('inventory_management:warehouse', pk=warehouse.pk)
+            return redirect("inventory_management:warehouse", pk=warehouse.pk)
 
         return HttpResponseNotAllowed("Метод не разрешен")
 
@@ -355,14 +385,14 @@ class WarehouseCreateView(LoginRequiredMixin, View):
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('inventory_management:main')
+            return redirect("inventory_management:main")
 
         form = AuthenticationForm()
-        return render(request, 'inventory_management/login.html', {'form': form})
+        return render(request, "inventory_management/login.html", {"form": form})
 
     def post(self, request):
         if request.user.is_authenticated:
-            return redirect('inventory_management:main')
+            return redirect("inventory_management:main")
 
         # Создаем форму из POST данных
         form = AuthenticationForm(data=request.POST)
@@ -370,12 +400,12 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('inventory_management:main')
+            return redirect("inventory_management:main")
         else:
-            return render(request, 'inventory_management/login.html', {'form': form})
+            return render(request, "inventory_management/login.html", {"form": form})
 
 
 class LogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('inventory_management:login')
+        return redirect("inventory_management:login")
