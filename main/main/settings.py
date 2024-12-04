@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%ap(zwbpmh)))dv3c=3!%f&x5rio@qo+x!^$e=@_6mmw(o5k%%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['invent-6qzk.onrender.com', 'localhost', '127.0.0.1']
 
 # DEBUG_TOOLBAR_CONF
 
