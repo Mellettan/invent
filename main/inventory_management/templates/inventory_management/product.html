@@ -1,0 +1,62 @@
+{% extends 'inventory_management/base.html' %}
+{% block title %} Продукт {% endblock %}
+{% block content %}
+<main class="container my-5" style="min-height: 70vh">
+    <h1 class="mb-4 text-dark">{{ product.name }}</h1>
+<div class="list-group-item mb-3 bg-secondary border-0 p-3">
+    <p class="text-muted">Описание: {{ product.description }}</p>
+
+    <!-- Форма для изменения цены -->
+    <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="price" class="form-label">Цена (₽)</label>
+            <input type="number" step="0.01" name="price" id="price" value="{{ product.price }}" class="form-control w-25">
+        </div>
+        <button type="submit" name="update_price" class="btn btn-primary">Обновить цену</button>
+    </form>
+
+    <p class="text-muted">Общее количество на складах: {{ total_quantity }} шт.</p>
+
+    <h5 class="mt-4">Склады, на которых есть этот продукт:</h5>
+    <form method="POST">
+        {% csrf_token %}
+        <ul class="list-group">
+            {% for warehouse_product in warehouse_products %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        <strong>{{ warehouse_product.warehouse.name }}</strong>
+                    </div>
+                    <div>
+                        <input type="number" name="quantity_{{ warehouse_product.pk }}" value="{{ warehouse_product.quantity }}" class="form-control w-50">
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <button type="submit" name="update_quantity" class="btn btn-primary mt-3">Обновить количество</button>
+    </form>
+
+    <!-- Форма для добавления нового склада -->
+    <h5 class="mt-4">Добавить склад для этого продукта:</h5>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="warehouse" class="form-label">Выберите склад:</label>
+            <select name="warehouse" id="warehouse" class="form-control">
+                {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.pk }}">{{ warehouse.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="new_quantity" class="form-label">Количество на складе:</label>
+            <input type="number" name="new_quantity" id="new_quantity" class="form-control" required>
+        </div>
+        <button type="submit" name="add_warehouse" class="btn btn-success mt-3">Добавить склад</button>
+    </form>
+
+</div>
+</main>
+
+{% endblock %}

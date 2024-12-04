@@ -1,0 +1,28 @@
+{% extends 'inventory_management/base.html' %}
+
+{% block title %} Создание заказа {% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <h1 class="mb-4">Создание нового заказа</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="product_ids" class="form-label">Выберите продукты</label>
+            <select name="product_ids" id="product_ids" class="form-control" multiple required>
+                {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }} ({{ product.price }} ₽)</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="quantities" class="form-label">Количество товаров</label>
+            <input type="number" name="quantities" id="quantities" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Создать заказ</button>
+    </form>
+</main>
+{% endblock %}

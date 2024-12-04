@@ -1,0 +1,44 @@
+{% extends 'inventory_management/base.html' %}
+
+{% block title %} Список продуктов {% endblock %}
+{% block content %}
+<main class="container my-5">
+    <h1 class="mb-4 text-dark">Список продуктов</h1>
+
+    <div class="list-group">
+        {% for product_info in products_data %}
+            <div class="list-group-item mb-3 bg-secondary border-0"
+                 onclick="window.location.href='{% url 'inventory_management:product' product_info.product.pk %}'"
+                 style="cursor: pointer">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-1">{{ product_info.product.name }}</h4>
+                </div>
+
+                <p class="text-muted">Общее количество: {{ product_info.total_quantity }} шт.</p>
+
+                <p class="text-muted">Цена: {{ product_info.product.price }}₽</p>
+
+                <div class="mt-2">
+                    <h5>Склады, на которых есть продукт:</h5>
+                    <ul class="list-group bg-secondary">
+                        {% for warehouse_product in product_info.warehouses %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #ccc">
+                                <div>
+                                    <strong>{{ warehouse_product.warehouse.name }}</strong>
+                                </div>
+                                <span class="badge bg-secondary">{{ warehouse_product.quantity }} шт.</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Кнопка для создания нового продукта -->
+    <div class="mt-4">
+        <a href="{% url 'inventory_management:create_product' %}" class="btn btn-primary">Создать новый продукт</a>
+    </div>
+
+</main>
+{% endblock %}

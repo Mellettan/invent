@@ -1,0 +1,24 @@
+{% extends 'inventory_management/base.html' %}
+
+{% block title %} Создание склада {% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <h1 class="mb-4">Создание нового склада</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Название склада</label>
+            <input type="text" name="name" id="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Адрес склада</label>
+            <input type="text" name="location" id="location" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Создать склад</button>
+    </form>
+</main>
+{% endblock %}

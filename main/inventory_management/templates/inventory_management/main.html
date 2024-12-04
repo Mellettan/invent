@@ -1,0 +1,79 @@
+{% extends 'inventory_management/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card bg-info d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Всего товаров в БД<br> <span class="fw-bold fs-1">{{products_amount}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card bg-primary bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Всего складов в БД<br> <span class="fw-bold fs-1">{{warehouses_amount}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center text-light">
+                    Всего активных заказов в БД<br> <span class="fw-bold fs-1">{{active_orders_amount}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card bg-warning bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Самый популярный продукт<br> <span class="fw-bold fs-2">{{most_popular_product}} ({{most_popular_quantity}} заказов)</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 mb-4">
+            <div class="card bg-success bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Общий доход от заказов за текущий месяц<br> <span class="fw-bold fs-1">{{total_month_income}}₽</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4 mb-4">
+            <div class="card bg-danger bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Товаров на складе с низким запасом<br><span class="fw-bold fs-1">{{low_stock_products}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card bg-info bg-gradient d-flex h-100">
+                <div class="card-body fs-2 text-center">
+                    Зарегистрированных пользователей<br><span class="fw-bold fs-1">{{total_users}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card bg-success bg-gradient">
+                <div class="card-body fs-2 text-center">
+                    Завершённых заказов<br><span class="fw-bold fs-1">{{completed_orders_amount}}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

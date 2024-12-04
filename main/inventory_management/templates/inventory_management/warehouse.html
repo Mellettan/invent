@@ -1,0 +1,22 @@
+{% extends 'inventory_management/base.html' %}
+{% block title %} Склад {% endblock %}
+{% block content %}
+<main class="container my-5">
+    <h1 class="mb-4 text-dark">Редактирование склада: {{ warehouse.name }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Название склада</label>
+            <input type="text" name="name" id="name" value="{{ warehouse.name }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Адрес склада</label>
+            <input type="text" name="location" id="location" value="{{ warehouse.location }}" class="form-control" required>
+        </div>
+
+        <button type="submit" name="update_warehouse" class="btn btn-primary">Обновить склад</button>
+    </form>
+</main>
+{% endblock %}

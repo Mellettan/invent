@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "invent"
+version = "0.1.0"
+description = "course_work_5sem"
+authors = ["mellettan <roman@mellettan.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.1.3"
+psycopg2-binary = "^2.9.10"
+django-debug-toolbar = "^4.4.6"
+loguru = "^0.7.2"
+black = "^24.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
