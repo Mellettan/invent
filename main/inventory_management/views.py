@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.views import View
 
 from .models import Product, WarehouseProduct, Warehouse, Order, OrderItem
+from .forms import RegisterForm
 
 
 class MainView(LoginRequiredMixin, View):
@@ -403,6 +404,27 @@ class LoginView(View):
             return redirect("inventory_management:main")
         else:
             return render(request, "inventory_management/login.html", {"form": form})
+
+
+class RegisterView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("inventory_management:main")
+
+        form = RegisterForm()
+        return render(request, "inventory_management/register.html", {"form": form})
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect("inventory_management:main")
+
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("inventory_management:main")
+        else:
+            return render(request, "inventory_management/register.html", {"form": form})
 
 
 class LogoutView(View):

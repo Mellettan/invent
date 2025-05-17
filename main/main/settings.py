@@ -23,13 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%ap(zwbpmh)))dv3c=3!%f&x5rio@qo+x!^$e=@_6mmw(o5k%%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = [
     'https://invent-6qzk.onrender.com',
 ]
 
-ALLOWED_HOSTS = ['invent-6qzk.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['invent-6qzk.onrender.com', 'localhost', '127.0.0.1', 'mellettan.ru', 'www.mellettan.ru']
 
 # DEBUG_TOOLBAR_CONF
 

@@ -1,0 +1,51 @@
+{% extends 'inventory_management/base.html' %}
+
+{% block title %} Регистрация {% endblock %}
+{% block content %}
+<div class="container mt-4 " style="min-height: 70vh">
+    <h1>Регистрация</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="username" class="form-label">Имя пользователя</label>
+            <input type="text" name="username" class="form-control" id="username" 
+                   value="{{ form.username.value|default_if_none:'' }}" required>
+            {% for error in form.username.errors %}
+                <div class="alert alert-danger mt-2">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" id="email" 
+                   value="{{ form.email.value|default_if_none:'' }}" required>
+            {% for error in form.email.errors %}
+                <div class="alert alert-danger mt-2">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="password1" class="form-label">Пароль</label>
+            <input type="password" name="password1" class="form-control" id="password1" required>
+            {% for error in form.password1.errors %}
+                <div class="alert alert-danger mt-2">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="password2" class="form-label">Подтверждение пароля</label>
+            <input type="password" name="password2" class="form-control" id="password2" required>
+            {% for error in form.password2.errors %}
+                <div class="alert alert-danger mt-2">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+    </form>
+    
+    <div class="mt-3">
+        Уже есть аккаунт? <a href="{% url 'inventory_management:login' %}">Войти</a>
+    </div>
+</div>
+{% endblock %}
